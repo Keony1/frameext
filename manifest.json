@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Frame.io - Current page only",
+  "description": "See comments only of specific pdf page",
+  "version": "1.0",
+  "icons": {
+    "16": "16x16.png",
+    "48": "50x50.png",
+    "128": "128x128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://app.frame.io/player/*"],
+      "js": ["content-script.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
