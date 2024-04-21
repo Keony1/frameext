@@ -8,11 +8,9 @@
     "48": "50x50.png",
     "128": "128x128.png"
   },
-  "content_scripts": [
-    {
-      "matches": ["https://app.frame.io/player/*"],
-      "js": ["content-script.js"],
-      "run_at": "document_end"
-    }
-  ]
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "host_permissions": ["https://app.frame.io/player/*"],
+  "permissions": ["activeTab", "scripting", "webNavigation"]
 }
