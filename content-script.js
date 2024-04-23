@@ -1,18 +1,18 @@
-let pdf_page = 1; // the page is always loaded at the pdf page one
-let buttonStatus = "show";
+var pdf_page = 1; // the page is always loaded at the pdf page one
+var buttonStatus = "show";
+var hideButtonStatus = "show";
 
 // nodes
-let prev;
-let next;
-let commentCardHeader;
-let presentations;
-let buttonTab;
-let inputNumber;
-let hideAllCheckedBtn;
-let reviews = [];
+var prev;
+var next;
+var commentCardHeader;
+var presentations;
+var buttonTab;
+var inputNumber;
+var hideAllCheckedBtn;
 
-const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 svg.setAttribute("aria-hidden", "true");
 svg.setAttribute("viewbox", "0 0 16 16");
 svg.setAttribute("width", "16px");
@@ -24,13 +24,13 @@ path.setAttribute(
 );
 svg.appendChild(path);
 
-function eventClickToGetPage() {
+function eventClickToGetPage(node) {
   const pg = getCommentDivPage(node);
-  pg = Number(pg.replace(/\D/g, ""));
+
   pdf_page = pg;
 }
 
-function commendDivIsChecked(commentDiv) {
+function commentDivIsChecked(commentDiv) {
   const buttonChecked = commentDiv.children[0].children[0].children[1];
   if (!buttonChecked) {
     return false;
@@ -65,56 +65,113 @@ function getCommentDivPage(commentDiv) {
 }
 
 function setReviewsVisibility() {
-  reviews.forEach((r) => {
-    const pg = getCommentDivPage(r);
-    if (pg == -1) {
+  const comments = Array.from(presentations.children);
+  for (const comment of comments) {
+    const commentPage = getCommentDivPage(comment);
+    if (commentPage === -1) {
       return;
     }
 
     if (
-      pg !== pdf_page &&
-      r.style.display !== "none" &&
+      commentPage !== pdf_page &&
+      comment.style.display !== "none" &&
       buttonStatus === "hide"
     ) {
-      r.style.display = "none";
+      comment.style.display = "none";
     } else if (
-      pg === pdf_page &&
-      r.style.display === "none" &&
-      buttonStatus === "hide"
-    ) {
-      r.style.display = "block";
-    } else if (
-      pg !== pdf_page &&
-      r.style.display !== "none" &&
-      buttonStatus === "hide"
-    ) {
-      r.style.display = "none";
-    } else if (
-      pg !== pdf_page &&
-      r.style.display === "none" &&
+      commentPage !== pdf_page &&
+      comment.style.display === "none" &&
       buttonStatus === "show"
     ) {
-      r.style.display = "block";
+      comment.style.display = "block";
+    } else if (
+      commentPage === pdf_page &&
+      comment.style.display === "none" &&
+      buttonStatus === "hide"
+    ) {
+      comment.style.display = "block";
+    } else if (
+      commentPage !== pdf_page &&
+      comment.style.display === "none" &&
+      buttonStatus === "show"
+    ) {
+      comment.style.dispay = "block";
+    } else if (
+      commentPage !== pdf_page &&
+      comment.style.display === "none" &&
+      buttonStatus === "hide"
+    ) {
+      comment.style.dispay = "none";
     }
-  });
+  }
 
   updateCommentCounter();
 }
 
 function updateCommentCounter() {
   let count = 0;
-  reviews.forEach((r) => {
-    if (r.style.display !== "none") {
+
+  const comments = Array.from(presentations.children);
+  comments.forEach((comment) => {
+    if (comment.style.display !== "none") {
       count++;
     }
   });
 
-  buttonTab.innerText = `${count} Comments`;
+  var cmt = "Comments";
+  if (count === 1) {
+    cmt = "Comment";
+  }
+
+  buttonTab.innerHTML = `<span>${count} ${cmt}</span>`;
 }
 
-const obs = new MutationObserver(function (mutations, observer) {
+function createToggleCommentsButton() {
+  const btn = document.createElement("button");
+  btn.classList.add("flex");
+  btn.classList.add("items-center");
+  btn.classList.add("justify-start");
+  btn.classList.add("bn");
+  btn.classList.add("button-reset");
+  btn.classList.add("bg-transparent");
+  btn.classList.add("white");
+  btn.classList.add("pointer");
+  btn.classList.add("pl2");
+  btn.title = "Current page only";
+  btn.style.lineHeight = "18px";
+  btn.style.fontSize = "13px";
+  btn.style.color = "#aab3c4";
+
+  svg.style.marginRight = "5px";
+
+  btn.appendChild(svg);
+  btn.appendChild(new Text("All Pages"));
+
+  commentCardHeader.children[0].style.display = "flex"; // align the div that contains the button
+  commentCardHeader.children[0].prepend(btn);
+
+  // do the filter
+  btn.addEventListener("click", () => {
+    if (btn.textContent === "All Pages") {
+      buttonStatus = "hide";
+      btn.textContent = "";
+      btn.appendChild(svg);
+      btn.appendChild(new Text("Current Page"));
+    } else {
+      buttonStatus = "show";
+      btn.textContent = "";
+      btn.appendChild(svg);
+      btn.appendChild(new Text("All Pages"));
+    }
+
+    setReviewsVisibility();
+  });
+}
+
+var docReady = false;
+var obs = new MutationObserver(function (mutations, observer) {
   for (let mutation of mutations) {
-    if (mutation.type === "childList" && !prev) {
+    if (mutation.type === "childList" && !docReady) {
       commentCardHeader = document.querySelector(
         ".comment-card__header-search-container",
       );
@@ -124,45 +181,34 @@ const obs = new MutationObserver(function (mutations, observer) {
       );
 
       if (presentations) {
+        docReady = true;
         const reviewObs = new MutationObserver((mutationsList, observer) => {
           for (let mutation of mutationsList) {
             if (mutation.type === "childList") {
               for (let node of mutation.addedNodes) {
-                // if the div is not a comment, just ignore
-                if (getCommentDivPage(node) === -1) {
-                  continue;
-                }
-                if (node.nodeType === 1) {
-                  node.addEventListener("click", eventClickToGetPage);
+                if (
+                  node.children[0]?.getAttribute("role") === "presentation" &&
+                  node.children[0]?.className.includes("Comment__StyledComment")
+                ) {
+                  if (node.nodeType === 1) {
+                    node.addEventListener("click", (_) => {
+                      eventClickToGetPage(node);
+                    });
 
-                  reviews.push(node);
-
-                  if (buttonStatus === "hide") {
-                    let pg = getCommentDivPage(node);
-
-                    if (pg !== pdf_page) {
-                      setReviewsVisibility();
+                    if (buttonStatus === "hide") {
+                      let pg = getCommentDivPage(node);
+                      if (pg !== pdf_page) {
+                        setReviewsVisibility();
+                      }
                     }
                   }
                 }
               }
-
-              // for (let node of mutation.removedNodes) {
-              //   // if the div is not a comment, ignore
-              //   if (getCommentDivPage(node) === -1) {
-              //     continue;
-              //   }
-
-              //   console.log(node === reviews[0]);
-              //   console.log(node);
-              //   console.log(reviews[0]);
-
-              //   reviews.pop();
-              // }
             }
+            //observer.disconnect();
           }
         });
-        reviewObs.observe(presentations, { childList: true, subtree: true });
+        reviewObs.observe(presentations, { childList: true });
       }
 
       prev = document.querySelector('[aria-label="Previous Page"]');
@@ -175,56 +221,28 @@ const obs = new MutationObserver(function (mutations, observer) {
             pdf_page = Number(event.target.value);
           }
           setReviewsVisibility();
-          updateCommentCounter();
         });
       }
 
       buttonTab = document.querySelector(".detail-pane__tab-container");
       if (buttonTab) {
         buttonTab = buttonTab.children[0].children[0].children[0];
+        const buttonTabObs = new MutationObserver((list, observer) => {
+          for (const mutation of list) {
+            if (mutation.type === "childList") {
+              for (let node of mutation.addedNodes) {
+                if (node.nodeType === 3) {
+                  setReviewsVisibility();
+                }
+              }
+            }
+          }
+        });
+        buttonTabObs.observe(buttonTab, { childList: true });
       }
 
       if (commentCardHeader) {
-        const btn = document.createElement("button");
-        //btn.classList.add("comment-card__header__hide-complete");
-        btn.classList.add("flex");
-        btn.classList.add("items-center");
-        btn.classList.add("justify-start");
-        btn.classList.add("bn");
-        btn.classList.add("button-reset");
-        btn.classList.add("bg-transparent");
-        btn.classList.add("white");
-        btn.classList.add("pointer");
-        btn.classList.add("pl2");
-        btn.title = "Current page only";
-        btn.style.lineHeight = "18px";
-        btn.style.fontSize = "13px";
-        btn.style.color = "#aab3c4";
-
-        svg.style.marginRight = "5px";
-
-        btn.appendChild(svg);
-        btn.appendChild(new Text("Current Page"));
-
-        commentCardHeader.children[0].style.display = "flex"; // align the div that contains the button
-        commentCardHeader.children[0].prepend(btn);
-
-        // do the filter
-        btn.addEventListener("click", () => {
-          if (btn.textContent === "Current Page") {
-            buttonStatus = "hide";
-            btn.textContent = "";
-            btn.appendChild(svg);
-            btn.appendChild(new Text("All Pages"));
-          } else {
-            buttonStatus = "show";
-            btn.textContent = "";
-            btn.appendChild(svg);
-            btn.appendChild(new Text("Current Page"));
-          }
-
-          setReviewsVisibility();
-        });
+        createToggleCommentsButton();
       }
 
       if (prev && next) {
@@ -245,14 +263,23 @@ const obs = new MutationObserver(function (mutations, observer) {
         ".comment-card__header__hide-complete",
       );
       if (hideAllCheckedBtn) {
-        hideAllCheckedBtn.addEventListener("click", (event) => {
-          if (hideAllCheckedBtn.children[0].innerText === "Hide") {
-            reviews = reviews.filter((r) => {
-              if (!commendDivIsChecked(r)) {
-                return r;
-              }
-            });
+        hideAllCheckedBtn.removeChild(hideAllCheckedBtn.children[0]);
+        const span = document.createElement("span");
+        span.innerText = "Shown";
+        span.style.marginRight = "5px";
+        hideAllCheckedBtn.prepend(span);
+
+        hideAllCheckedBtn.addEventListener("click", (_) => {
+          if (span.innerText === "Shown") {
+            hideButtonStatus = "hide";
+            span.innerText = "Hidden";
+          } else {
+            hideButtonStatus = "show";
+            span.innerText = "Shown";
           }
+
+          updateCommentCounter();
+          //setReviewsVisibility();
         });
       }
     }
@@ -274,3 +301,9 @@ document.onkeydown = function (e) {
     setReviewsVisibility();
   }
 };
+
+// To work with refresh and navigation with MutationObserver,
+// in common portuguese from brazil: a little "gambiarra"
+var ch = new Text("");
+document.body.appendChild(ch);
+document.body.removeChild(ch);
