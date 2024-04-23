@@ -65,8 +65,7 @@ function getCommentDivPage(commentDiv) {
 }
 
 function setReviewsVisibility() {
-  const comments = Array.from(presentations.children);
-  for (const comment of comments) {
+  for (const comment of presentations.children) {
     const commentPage = getCommentDivPage(comment);
     if (commentPage === -1) {
       return;
@@ -110,24 +109,31 @@ function setReviewsVisibility() {
 
 function updateCommentCounter() {
   let count = 0;
+  let total = presentations.children.length;
 
-  const comments = Array.from(presentations.children);
-  comments.forEach((comment) => {
+  for (const comment of presentations.children) {
     if (comment.style.display !== "none") {
       count++;
     }
-  });
-
-  var cmt = "Comments";
-  if (count === 1) {
-    cmt = "Comment";
   }
 
-  buttonTab.innerHTML = `<span>${count} ${cmt}</span>`;
+  var cmt = "Comments";
+  if (buttonStatus === "hide") {
+    if (total === 1) {
+      cmt = "Comment";
+    }
+    buttonTab.innerHTML = `<span>${count} of ${total} ${cmt}</span>`;
+  } else {
+    if (count === 1) {
+      cmt = "Comment";
+    }
+    buttonTab.innerHTML = `<span>${count} ${cmt}</span>`;
+  }
 }
 
 function createToggleCommentsButton() {
   const btn = document.createElement("button");
+  btn.id = "ext-btn";
   btn.classList.add("flex");
   btn.classList.add("items-center");
   btn.classList.add("justify-start");
@@ -148,7 +154,9 @@ function createToggleCommentsButton() {
   btn.appendChild(new Text("All Pages"));
 
   commentCardHeader.children[0].style.display = "flex"; // align the div that contains the button
-  commentCardHeader.children[0].prepend(btn);
+  if (commentCardHeader.children[0].children[0].id !== btn.id) {
+    commentCardHeader.children[0].prepend(btn);
+  }
 
   // do the filter
   btn.addEventListener("click", () => {
@@ -294,12 +302,11 @@ obs.observe(document.body, {
 document.onkeydown = function (e) {
   if (e.key === "ArrowRight") {
     pdf_page = pdf_page + 1;
-    setReviewsVisibility();
   } else if (e.key === "ArrowLeft") {
     if (pdf_page == 1) return;
     pdf_page = pdf_page - 1;
-    setReviewsVisibility();
   }
+  setReviewsVisibility();
 };
 
 // To work with refresh and navigation with MutationObserver,

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Frame.io - Current page only",
-  "description": "See comments only of specific pdf page",
+  "description": "Show comments only in the page you're currently viewing on a multi-page PDF, and hide others.",
   "version": "1.0",
   "icons": {
     "16": "16x16.png",
@@ -12,5 +12,5 @@
     "service_worker": "service_worker.js"
   },
   "host_permissions": ["https://app.frame.io/player/*"],
-  "permissions": ["activeTab", "scripting", "webNavigation"]
+  "permissions": ["activeTab", "scripting"]
 }
