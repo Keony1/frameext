@@ -8,6 +8,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           files: ["content-script.js"],
         })
         .then(() => console.log("script inserido"));
+
+      chrome.scripting
+        .insertCSS({
+          target: { tabId },
+          files: ["content.css"],
+        })
+        .then(() => console.log("css inserido"));
     }
   }
 });
