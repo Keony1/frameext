@@ -10,6 +10,7 @@ var presentations;
 var buttonTab;
 var inputNumber;
 var hideAllCheckedBtn;
+var totalPdfPages;
 
 var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -226,6 +227,10 @@ var obs = new MutationObserver(function (mutations, observer) {
       if (inputNumber) {
         inputNumber.addEventListener("input", (event) => {
           if (!isNaN(event.target.value)) {
+            const n = Number(event.target.value);
+            if (n > totalPdfPages || n < 1) {
+              return;
+            }
             pdf_page = Number(event.target.value);
           }
           setReviewsVisibility();
@@ -290,6 +295,13 @@ var obs = new MutationObserver(function (mutations, observer) {
           //setReviewsVisibility();
         });
       }
+
+      totalPdfPages = document.querySelector(
+        ".PageControl__PageNumberTotal-sc-1xmmo7b-5",
+      );
+      if (totalPdfPages) {
+        totalPdfPages = Number(totalPdfPages.innerText.replace("/", ""));
+      }
     }
   }
 });
@@ -301,6 +313,7 @@ obs.observe(document.body, {
 
 document.onkeydown = function (e) {
   if (e.key === "ArrowRight") {
+    if (pdf_page === totalPdfPages) return;
     pdf_page = pdf_page + 1;
   } else if (e.key === "ArrowLeft") {
     if (pdf_page == 1) return;
