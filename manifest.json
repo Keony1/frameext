@@ -11,6 +11,9 @@
   "background": {
     "service_worker": "service_worker.js"
   },
-  "host_permissions": ["https://app.frame.io/player/*"],
+  "host_permissions": [
+    "https://app.frame.io/player/*",
+    "https://app.frame.io/compare/*"
+  ],
   "permissions": ["activeTab", "scripting"]
 }

@@ -11,6 +11,7 @@ var buttonTab;
 var inputNumber;
 var hideAllCheckedBtn;
 var totalPdfPages;
+var pdfPageNode;
 
 var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -223,20 +224,6 @@ var obs = new MutationObserver(function (mutations, observer) {
       prev = document.querySelector('[aria-label="Previous Page"]');
       next = document.querySelector('[aria-label="Next Page"]');
 
-      inputNumber = document.querySelector("input[type=number]");
-      if (inputNumber) {
-        inputNumber.addEventListener("input", (event) => {
-          if (!isNaN(event.target.value)) {
-            const n = Number(event.target.value);
-            if (n > totalPdfPages || n < 1) {
-              return;
-            }
-            pdf_page = Number(event.target.value);
-          }
-          setReviewsVisibility();
-        });
-      }
-
       buttonTab = document.querySelector(".detail-pane__tab-container");
       if (buttonTab) {
         buttonTab = buttonTab.children[0].children[0].children[0];
@@ -301,6 +288,25 @@ var obs = new MutationObserver(function (mutations, observer) {
       );
       if (totalPdfPages) {
         totalPdfPages = Number(totalPdfPages.innerText.replace("/", ""));
+      }
+
+      pdfPageNode = document.querySelector(".TextInput-a3o9vm-4");
+      if (pdfPageNode) {
+        pdf_page = Number(pdfPageNode.value) || 1;
+
+        pdfPageNode.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            if (!isNaN(event.target.value)) {
+              const max = Number(pdfPageNode.max);
+              const n = Number(event.target.value);
+              if (n > max || n < 1) {
+                return;
+              }
+              pdf_page = Number(event.target.value);
+            }
+          }
+          setReviewsVisibility();
+        });
       }
     }
   }

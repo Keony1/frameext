@@ -1,7 +1,7 @@
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
     const url = new URL(tab.url);
-    if (url.pathname.includes("/player")) {
+    if (url.pathname.includes("/player") || url.pathname.includes("/compare")) {
       chrome.scripting
         .executeScript({
           target: { tabId, allFrames: false },
