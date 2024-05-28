@@ -53,6 +53,15 @@ function getCommentDivPage(commentDiv) {
     let pg =
       commentDiv.children[0].children[1].children[0].children[0].innerText;
 
+    // the blue dot near the user photo
+    if (
+      commentDiv.children[0].children[0].className.includes(
+        "Comment__NewDot-sc-1g917d0-0",
+      )
+    ) {
+      pg = commentDiv.children[0].children[2].children[0].children[0].innerText;
+    }
+
     if (pg && !pg.includes("pg.")) {
       pg = commentDiv.children[0].children[2].children[0].children[0].innerText;
     }
