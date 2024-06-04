@@ -1,10 +1,14 @@
 var pdf_page = 1;
 var btn_status = "show";
+var totalPages;
 
 // Nodes
 var filterHeader;
 var commentsContainer;
-var totalPages;
+var prevBtn;
+var nextBtn;
+var commentCounterText;
+var pdfPageInput;
 // /Nodes
 
 function createFilterButton() {
@@ -56,9 +60,24 @@ function getCommentPage(commentDiv) {
   );
 
   if (!pgContainer) {
+    // things that are not comments
     return -1;
   }
   return Number(pgContainer.innerHTML.replace(/\D/g, ""));
+}
+
+function toggleCommentReplies(comments, start, display) {
+  let count = 0;
+  let comment = comments[start];
+  while (comment && getCommentPage(comment) === -1) {
+    comment.style.display = display;
+
+    start += 1;
+    count += 1;
+    comment = comments[start];
+  }
+
+  return count;
 }
 
 function toggleCommentsVisibility() {
@@ -66,11 +85,10 @@ function toggleCommentsVisibility() {
     ".Box-vapor__sc-21a9bb33-0.ScrollBox-vapor__sc-3587a982-1.bqxwQB.ZOnJu",
   );
   const commentsContainer = commentsContainerParent.children[0];
-  for (const comment of commentsContainer.children) {
-    const commentPage = getCommentPage(comment);
-    if (commentPage === -1) {
-      return;
-    }
+  const comments = commentsContainer.children;
+  for (let i = 0; i < comments?.length; i++) {
+    let comment = comments[i];
+    let commentPage = getCommentPage(comment);
 
     if (
       commentPage !== pdf_page &&
@@ -95,14 +113,50 @@ function toggleCommentsVisibility() {
       comment.style.display === "none" &&
       btn_status === "show"
     ) {
-      comment.style.dispay = "block";
+      comment.style.display = "block";
     } else if (
       commentPage !== pdf_page &&
       comment.style.display === "none" &&
       btn_status === "hide"
     ) {
-      comment.style.dispay = "none";
+      comment.style.display = "none";
     }
+
+    i += toggleCommentReplies(comments, i + 1, comment.style.display);
+  }
+
+  //updateCommentCounter();
+}
+
+function updateCommentCounter() {
+  const commentsContainerParent = document.querySelector(
+    ".Box-vapor__sc-21a9bb33-0.ScrollBox-vapor__sc-3587a982-1.bqxwQB.ZOnJu",
+  );
+  const commentsContainer = commentsContainerParent.children[0];
+  const comments = commentsContainer.children;
+
+  let count = 0;
+  let total = 0;
+  for (const comment of comments) {
+    if (getCommentPage(comment) !== -1 && comment.style.display !== "none") {
+      count++;
+    }
+
+    if (getCommentPage(comment) !== -1) {
+      total++;
+    }
+  }
+  var cmt = "Comments";
+  if (btn_status === "hide") {
+    if (total === 1) {
+      cmt = "Comment";
+    }
+    commentCounterText.innerHTML = `<span>${count} of ${total} ${cmt}</span>`;
+  } else {
+    if (count === 1) {
+      cmt = "Comment";
+    }
+    commentCounterText.innerHTML = `<span>${count} ${cmt}</span>`;
   }
 }
 
@@ -136,7 +190,7 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
 
       if (commentsContainer) {
         commentsContainer = commentsContainer.children[0];
-        const commentsObs = new MutationObserver((mutationList, observer) => {
+        const commentsObs = new MutationObserver((mutationList, _) => {
           for (let mutation of mutationList) {
             if (mutation.type === "childList") {
               for (let node of mutation.addedNodes) {
@@ -153,6 +207,30 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
         commentsObs.observe(commentsContainer, { childList: true });
       }
     }
+
+    [prevBtn, nextBtn] = document.querySelectorAll(
+      ".StyledButton-vapor__sc-b732d0e4-0.ZqICN",
+    );
+    if (prevBtn && nextBtn) {
+      prevBtn.addEventListener("click", () => {
+        if (pdf_page == 1) return;
+        pdf_page = pdf_page - 1;
+        toggleCommentsVisibility();
+      });
+      nextBtn.addEventListener("click", () => {
+        if (pdf_page === totalPages) return;
+        pdf_page = pdf_page + 1;
+        toggleCommentsVisibility();
+      });
+    }
+
+    pdfPageInput = document.querySelector(
+      ".StyledInput-vapor__sc-d70028cb-0.kwQtRu",
+    );
+
+    commentCounterText = document.querySelector(
+      ".Box-vapor__sc-21a9bb33-0.iFpWCv",
+    );
   }
 });
 bodyObserver.observe(document.body, { childList: true });
@@ -165,5 +243,6 @@ document.onkeydown = function (e) {
     if (pdf_page == 1) return;
     pdf_page = pdf_page - 1;
   }
+  //  pdfPageInput.value = pdf_page;
   toggleCommentsVisibility();
 };
