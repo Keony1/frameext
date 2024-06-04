@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Frame.io - Current page only",
+  "description": "Show comments only in the page you're currently viewing on a multi-page PDF, and hide others.",
+  "version": "1.0",
+  "icons": {
+    "16": "16x16.png",
+    "48": "50x50.png",
+    "128": "128x128.png"
+  },
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "host_permissions": ["https://next.frame.io/project/*"],
+  "permissions": ["activeTab", "scripting"]
+}
