@@ -9,6 +9,7 @@ var prevBtn;
 var nextBtn;
 var commentCounterText;
 var pdfPageInput;
+var pdfPageContainer;
 // /Nodes
 
 function createFilterButton() {
@@ -230,6 +231,29 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
       if (pdfPageInput) {
       }
 
+      pdfPageContainer = document.querySelector(".sc-ef6e0dc-0.eMWYMH");
+      if (pdfPageContainer) {
+        var pdfPageObs = new MutationObserver((mutationList, _) => {
+          for (let mutation of mutationList) {
+            if (mutation.type === "attributes") {
+              // selected thumbnail
+              if (mutation.target.className === "sc-fd60a1e3-1 fajzqY") {
+                const pgContainer = mutation.target.querySelectorAll(
+                  ".StyledText-vapor__sc-a9d66504-0.btJdwr",
+                );
+                const pg = pgContainer[pgContainer.length - 1];
+                pdf_page = Number(pg.innerHTML);
+                toggleCommentsVisibility();
+              }
+            }
+          }
+        });
+        pdfPageObs.observe(pdfPageContainer, {
+          attributes: true,
+          subtree: true,
+        });
+      }
+
       commentCounterText = document.querySelector(
         ".Box-vapor__sc-21a9bb33-0.iFpWCv",
       );
@@ -237,15 +261,3 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
   }
 });
 bodyObserver.observe(document.body, { childList: true });
-
-document.onkeydown = function (e) {
-  if (e.key === "ArrowRight") {
-    if (pdf_page === totalPages) return;
-    pdf_page = pdf_page + 1;
-    toggleCommentsVisibility();
-  } else if (e.key === "ArrowLeft") {
-    if (pdf_page == 1) return;
-    pdf_page = pdf_page - 1;
-    toggleCommentsVisibility();
-  }
-};
