@@ -10,42 +10,71 @@ var nextBtn;
 var commentCounterText;
 var pdfPageInput;
 var pdfPageContainer;
+var filterPane;
 // /Nodes
 
 function createFilterButton() {
   if (!filterHeader) return;
   var divButtons = filterHeader.children[0];
 
+  // button is already there
+  if (divButtons.querySelector("#ext-btn")) {
+    return;
+  }
+
   var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  svg.setAttribute("aria-hidden", "true");
-  svg.setAttribute("viewbox", "0 0 16 16");
-  svg.setAttribute("width", "16px");
-  svg.setAttribute("height", "16px");
-  svg.setAttribute("fill", "#9195ae8c");
-  path.setAttribute(
-    "d",
-    "M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm-.77 10.756l4.352-4.359a.75.75 0 0 0-1.062-1.06l-4.352 4.36a.75.75 0 1 0 1.061 1.06zm.001-1.064L5.096 7.56a.75.75 0 0 0-1.06 1.062l2.136 2.132a.75.75 0 1 0 1.06-1.062z",
+  var pathCircle = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path",
   );
-  svg.style.marginRight = "5px";
-  svg.appendChild(path);
+  var pathCheck = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path",
+  );
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("viewbox", "0 0 24 24");
+  svg.setAttribute("width", "24px");
+  svg.setAttribute("height", "24px");
+  svg.setAttribute("fill", "#9195ae8c");
+  pathCheck.setAttribute(
+    "d",
+    "M4.12158 8.82129C4.4292 8.82129 4.6709 8.70264 4.83789 8.45654L8.9292 2.2207C9.04785 2.04053 9.09619 1.86914 9.09619 1.71094C9.09619 1.28467 8.771 0.968262 8.33154 0.968262C8.03271 0.968262 7.84375 1.07812 7.65918 1.36377L4.104 6.97119L2.30225 4.76074C2.13525 4.55859 1.95068 4.4707 1.6958 4.4707C1.25195 4.4707 0.931152 4.78711 0.931152 5.21777C0.931152 5.41113 0.988281 5.57812 1.15527 5.76709L3.42285 8.4917C3.61182 8.71582 3.83154 8.82129 4.12158 8.82129Z",
+  );
+  pathCircle.setAttribute(
+    "d",
+    "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm7.5-9a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z",
+  );
+  pathCheck.setAttribute("fill", "#9195ae8c");
+  pathCheck.style.transform = "translate(7px, 7px)";
+  pathCircle.setAttribute("fill", "#9195ae8c");
+  svg.appendChild(pathCheck);
+  svg.appendChild(pathCircle);
 
   const btn = document.createElement("button");
   btn.id = "ext-btn";
+  btn.classList.add("StyledToggleIconButton-vapor__sc-b90dcabf-0");
   btn.classList.add("eLftJr");
 
   btn.title = "Current page only";
   btn.appendChild(svg);
   btn.addEventListener("mouseover", () => {
-    svg.setAttribute("fill", "#9195ae8c");
+    pathCheck.setAttribute("fill", "#f3f3f7e6");
+    pathCircle.setAttribute("fill", "#f3f3f7e6");
+    btn.style.backgroundColor = "#393d4f59";
   });
   btn.addEventListener("mouseout", () => {
-    svg.setAttribute("fill", "#B8C1CF");
+    if (btn_status === "hide") return;
+    pathCheck.setAttribute("fill", "#9195ae8c");
+    pathCircle.setAttribute("fill", "#9195ae8c");
+    btn.style.backgroundColor = "transparent";
   });
 
   btn.addEventListener("click", () => {
     if (btn_status === "show") {
       btn_status = "hide";
+      pathCheck.setAttribute("fill", "#f3f3f7e6");
+      pathCircle.setAttribute("fill", "#f3f3f7e6");
+      btn.style.backgroundColor = "#393d4f59";
     } else {
       btn_status = "show";
     }
@@ -169,11 +198,11 @@ function eventClickToGetPage(comment) {
 var docReady = false;
 var bodyObserver = new MutationObserver((mutations, observer) => {
   for (let mutation of mutations) {
-    if (mutation.type === "childList" && !docReady) {
+    if (mutation.type === "childList") {
       filterHeader = document.querySelector(
         ".Box-vapor__sc-21a9bb33-0 .iwIbbg",
       );
-      if (filterHeader) {
+      if (filterHeader && !docReady) {
         docReady = true;
         createFilterButton();
       }
@@ -257,6 +286,22 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
       commentCounterText = document.querySelector(
         ".Box-vapor__sc-21a9bb33-0.iFpWCv",
       );
+
+      // filterPane = document.querySelector(
+      //   ".StyledMenuList-vapor__sc-9891138c-0.eTXGYj",
+      // );
+      // if (filterPane) {
+      //   var completedDiv = filterPane.children[0].children[3];
+      //   var checkboxParent = completedDiv.querySelector(
+      //     ".StyledCheckbox-vapor__sc-9e98f2e1-1.hdGxcR",
+      //   );
+      //   if (checkboxParent.children.length > 0) {
+      //     console.log("checked");
+      //   } else {
+      //     console.log("cheked'nt"); // I know the grammar is wrong, but its funny.
+      //   }
+      //   console.log("checkbox", checkboxParent.children);
+      // }
     }
   }
 });
