@@ -58,23 +58,24 @@ function createFilterButton() {
   btn.title = "Current page only";
   btn.appendChild(svg);
   btn.addEventListener("mouseover", () => {
+    btn.style.backgroundColor = "#393d4f59";
+    if (btn_status === "hide") return;
     pathCheck.setAttribute("fill", "#f3f3f7e6");
     pathCircle.setAttribute("fill", "#f3f3f7e6");
-    btn.style.backgroundColor = "#393d4f59";
   });
   btn.addEventListener("mouseout", () => {
+    btn.style.backgroundColor = "transparent";
     if (btn_status === "hide") return;
     pathCheck.setAttribute("fill", "#9195ae8c");
     pathCircle.setAttribute("fill", "#9195ae8c");
-    btn.style.backgroundColor = "transparent";
   });
 
   btn.addEventListener("click", () => {
     if (btn_status === "show") {
       btn_status = "hide";
-      pathCheck.setAttribute("fill", "#f3f3f7e6");
-      pathCircle.setAttribute("fill", "#f3f3f7e6");
-      btn.style.backgroundColor = "#393d4f59";
+      pathCheck.setAttribute("fill", "#5b53ff");
+      pathCircle.setAttribute("fill", "#5b53ff");
+      btn.style.backgroundColor = "transparent";
     } else {
       btn_status = "show";
     }
