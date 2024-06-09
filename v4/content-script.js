@@ -236,7 +236,9 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
             }
           }
         });
-        commentsObs.observe(commentsContainer, { childList: true });
+        commentsObs.observe(commentsContainer, {
+          childList: true,
+        });
       }
 
       prevBtn = document.querySelector('[data-testid="previous-page"]');
@@ -306,4 +308,4 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
     }
   }
 });
-bodyObserver.observe(document.body, { childList: true });
+bodyObserver.observe(document.body, { childList: true, subtree: true });
