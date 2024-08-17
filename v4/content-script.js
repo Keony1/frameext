@@ -52,8 +52,8 @@ function createFilterButton() {
 
   const btn = document.createElement("button");
   btn.id = "ext-btn";
-  btn.classList.add("StyledToggleIconButton-vapor__sc-b90dcabf-0");
-  btn.classList.add("eLftJr");
+  btn.classList.add("StyledToggleIconButton-vapor__sc-f049ee42-0");
+  btn.classList.add("drLDXB");
 
   btn.title = "Current page only";
   btn.appendChild(svg);
@@ -113,7 +113,7 @@ function toggleCommentReplies(comments, start, display) {
 
 function toggleCommentsVisibility() {
   const commentsContainerParent = document.querySelector(
-    ".Box-vapor__sc-21a9bb33-0.ScrollBox-vapor__sc-3587a982-1.bqxwQB.ZOnJu",
+    ".Box-vapor__sc-eeca0929-0.ScrollBox-vapor__sc-76884221-1.cfboZI.eBOYNV",
   );
   const commentsContainer = commentsContainerParent.children[0];
   const comments = commentsContainer.children;
@@ -161,7 +161,7 @@ function toggleCommentsVisibility() {
 
 function updateCommentCounter() {
   const commentsContainerParent = document.querySelector(
-    ".Box-vapor__sc-21a9bb33-0.ScrollBox-vapor__sc-3587a982-1.bqxwQB.ZOnJu",
+    ".Box-vapor__sc-eeca0929-0.ScrollBox-vapor__sc-76884221-1.cfboZI.eBOYNV",
   );
   const commentsContainer = commentsContainerParent.children[0];
   const comments = commentsContainer.children;
@@ -201,7 +201,7 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
   for (let mutation of mutations) {
     if (mutation.type === "childList") {
       filterHeader = document.querySelector(
-        ".Box-vapor__sc-21a9bb33-0 .iwIbbg",
+        ".Box-vapor__sc-eeca0929-0 .kwqqpl",
       );
       if (filterHeader && !docReady) {
         docReady = true;
@@ -209,11 +209,11 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
       }
 
       commentsContainer = document.querySelector(
-        ".Box-vapor__sc-21a9bb33-0.ScrollBox-vapor__sc-3587a982-1.bqxwQB.ZOnJu",
+        ".Box-vapor__sc-eeca0929-0.ScrollBox-vapor__sc-76884221-1.cfboZI.eBOYNV",
       );
 
       totalPages = document.querySelector(
-        ".StyledText-vapor__sc-a9d66504-0.fXwLkI",
+        ".StyledText-vapor__sc-a9d66504-0.fEglBN",
       );
       if (totalPages) {
         totalPages = Number(totalPages.innerHTML.replace("/", ""));
@@ -263,15 +263,15 @@ var bodyObserver = new MutationObserver((mutations, observer) => {
       if (pdfPageInput) {
       }
 
-      pdfPageContainer = document.querySelector(".sc-ef6e0dc-0.eMWYMH");
+      pdfPageContainer = document.querySelector(".sc-f5cf8f7e-1.eLHvSR");
       if (pdfPageContainer) {
         var pdfPageObs = new MutationObserver((mutationList, _) => {
           for (let mutation of mutationList) {
             if (mutation.type === "attributes") {
               // selected thumbnail
-              if (mutation.target.className === "sc-fd60a1e3-1 fajzqY") {
+              if (mutation.target.className === "sc-fd60a1e3-1 lkzWop") {
                 const pgContainer = mutation.target.querySelectorAll(
-                  ".StyledText-vapor__sc-a9d66504-0.btJdwr",
+                  ".StyledText-vapor__sc-a9d66504-0.dWeaTm",
                 );
                 const pg = pgContainer[pgContainer.length - 1];
                 pdf_page = Number(pg.innerHTML);
